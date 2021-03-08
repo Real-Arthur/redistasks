@@ -48,6 +48,22 @@ app.post('/task/add', function(req, res){
   })
 })
 
+app.post('/task/delete', function(req, res){
+  const tasksToDel = req.body.tasks;
+  client.lrange('tasks', 0, -1, function(err, tasks){
+    for(let i = 0; i < tasks.length; i++){
+      if(tasksToDel.indexOf(tasks[i]) > -1){
+        client.lrem('tasks', 0, tasks[i], function(){
+          if(err){
+            console.log(err);
+          }
+        });
+      }
+    }
+    res.redirect('/')
+  })
+})
+
 app.listen(3000);
 console.log('Server running on port 30000');
 
