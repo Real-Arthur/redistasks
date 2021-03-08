@@ -27,9 +27,24 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', function(req,res) {
   const title = 'Task List';
-  
-  res.render('index', {
-    title: title
+
+  client.lrange('tasks', 0, -1, function(err, reply) {
+    res.render('index', {
+    title: title,
+    tasks: reply
+  })  
+  });
+})
+
+app.post('/task/add', function(req, res){
+  console.log('req', req.body);
+  const task = req.body.task;
+  client.rpush('tasks', task, function(err, reply){
+    if(err){
+      console.log(err);
+    }
+    console.log('Task Added');
+    res.redirect('/')
   })
 })
 
